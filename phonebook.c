@@ -11,6 +11,8 @@ struct contact{
 	char cellp[15];
 };
 
+#define MAX_SIZE_NAME 31
+#define MAX_SIZE_NUMBER 15
 #define TOTAL_CONTACTS 5
 struct contact A[TOTAL_CONTACTS];
 
@@ -32,6 +34,7 @@ void sortl(void);
 void sortp(void);
 void sortc(void);
 void help(void);
+size_t get_input(char*, size_t);
 int last;
 
 int main()
@@ -92,13 +95,11 @@ int main()
 void insert(void)
 {
 	char ans='y';
-	char *string = NULL;
 	size_t len=0;
 	size_t len_size=0;
 	clrscr();
     printf("\nPhone Book12<::>Insert Contacts");
     printf("\n--------------------------------------------------------------------------------");
-	string = (char *)malloc(31);
 	
 	while(ans=='y'){
 		if(last == TOTAL_CONTACTS)
@@ -106,21 +107,16 @@ void insert(void)
 		else{
 			printf("\n\nData of Contact %2.2d{\n",last+1);
 			printf("\n\t  1-F.Name: ");
-			len_size = getline(&string,&len,stdin);
-			strcpy(A[last].fname, string);
+            len_size = get_input(A[last].fname, MAX_SIZE_NAME);
 			
 			printf("\t  2-L.Name: ");
-			len_size = getline(&string,&len,stdin);
-			strcpy(A[last].lname, string);
+            len_size = get_input(A[last].lname, MAX_SIZE_NAME);
 			
 			printf("\t  3-Tele.P: ");
-			len_size = getline(&string,&len,stdin);
-			strcpy(A[last].telep, string);
+            len_size = get_input(A[last].telep, MAX_SIZE_NUMBER);
 			
 			printf("\t  4-Cell.P: ");
-			len_size = getline(&string,&len,stdin);
-			strcpy(A[last].cellp, string);
-
+            len_size = get_input(A[last].cellp, MAX_SIZE_NUMBER);
 	    
 			printf("\n|-->Data Recorded!}");
 			printf("\n\t\t\tNext Contact?(y/n) Answer:");
@@ -131,13 +127,11 @@ void insert(void)
 	}
 	printf("\n\nYou have inserted ( %d ) contact!\nPress a key to return main page & continue program|-->",last);
 	getc(stdin);
-    free(string);
 }
 
 void delet(void)
 {
-	char dfname_string[5],dlname_string[5];
-	char *input = NULL;
+	char dfname_string[31], dlname_string[31];
 	size_t len=0;
 	size_t len_size=0;
 	register int i,j,find=0;
@@ -147,12 +141,10 @@ void delet(void)
     printf("\n--------------------------------------------------------------------------------");
 	printf ("\n::Enter data of the contact that you want delete it,please:");
 	printf("\n\n  ::Enter first name: ");
-	len_size = getline(&input,&len,stdin);
-	strcpy(dfname_string,input);
+    len_size = get_input(dfname_string, MAX_SIZE_NAME);
 
 	printf("\n  ::Enter last name: ");
-	len_size = getline(&input,&len,stdin);
-	strcpy(dlname_string,input);
+    len_size = get_input(dlname_string, MAX_SIZE_NAME);
 	
 	for (i = 0; i < last; i++) {
 	 if (strcmp (dfname_string, A[i].fname) == 0 && strcmp (dlname_string, A[i].lname) == 0 ) {
@@ -178,7 +170,6 @@ void delet(void)
 	else
 		printf("\t\t\n<<Target contact was successfully deleted from list!>>");
 	printf("\n\n\nPress a key to return main page & continue program|-->");
-    free(input);
 	getc(stdin);
 }
 
@@ -196,14 +187,14 @@ void edit()
 	printf ("\n::Enter data of the contact that you want edit it,please:");
 	
 	printf("\n\n  ::Enter first name: ");
-	len_size = getline(&dfname,&len,stdin);
+    len_size = get_input(dfname, MAX_SIZE_NAME);
 	printf("\n  ::Enter last name: ");
-	len_size = getline(&dlname,&len,stdin);
+    len_size = get_input(dlname, MAX_SIZE_NAME);
 
 	for (i=0; i < last; i++) {
 	 if (strcmp (dfname, A[i].fname) == 0 && strcmp (dlname, A[i].lname) == 0 ) {
 	 	printf("\nContact found! Details:");
-		printf("\n\nCantact %2.2d{",i+1);
+		printf("\n\nContact %2.2d{",i+1);
 		printf("\n\t   F.Name:%s\n\t   L.name:%s\n\t   Tele.P:%s\n\t   Cell.P:%s\n\t   }",A[i].fname,A[i].lname,A[i].telep,A[i].cellp);
 		printf("\n\nDo you want edit it?(y/n) ");
 		ch = getc(stdin);
@@ -237,40 +228,45 @@ void edit()
 		printf("\t\t\n<<Target contact was successfully updated!>>");
 	printf("\n\n\n   ::Press a key to return main page & continue program|-->");
 	getc(stdin);
+    free(dfname);
+    free(dlname);
+
 }
 
 void search(void)
 {
 	char ch;
-	clrscr();
-    printf("\nPhone Book12<::>$earch Contacts");
-    printf("\n--------------------------------------------------------------------------------");
-	printf("\nChoose search type,please:\n\n");
-	printf("\t[1] |--> Search by first name\n");
-	printf("\t[2] |--> Search by last name\n");
-	printf("\t[3] |--> Search by phone number\n");
-	printf("\t[4] |--> Search by cellphone number\n");
-	printf("\t[5] |--> Main Menu\n");
-	printf("\n\t::Enter a number (1-5): ");
-	ch = getc(stdin);
-	getc(stdin);
-	printf("\n--------------------------------------------------------------------------------");
-    switch(ch) {
-		case '1':
-		searchf();
-	    break;
-		case '2':
-		searchl();
-		break;
-		case '3':
-		searchp();
-		break;
-		case '4':
-		searchc();
-		break;
-		case '5':
-		default:
-			return;
+    while(1) {
+        clrscr();
+        printf("\nPhone Book12<::>$earch Contacts");
+        printf("\n--------------------------------------------------------------------------------");
+        printf("\nChoose search type,please:\n\n");
+        printf("\t[1] |--> Search by first name\n");
+        printf("\t[2] |--> Search by last name\n");
+        printf("\t[3] |--> Search by phone number\n");
+        printf("\t[4] |--> Search by cellphone number\n");
+        printf("\t[5] |--> Main Menu\n");
+        printf("\n\t::Enter a number (1-5): ");
+        ch = getc(stdin);
+        getc(stdin);
+        printf("\n--------------------------------------------------------------------------------");
+        switch (ch) {
+            case '1':
+                searchf();
+                break;
+            case '2':
+                searchl();
+                break;
+            case '3':
+                searchp();
+                break;
+            case '4':
+                searchc();
+                break;
+            case '5':
+            default:
+                return;
+        }
     }
 }
 
@@ -281,7 +277,8 @@ void searchf(void)
 	size_t len=0;
 	size_t len_size=0;
 	printf("Enter a first name to search:");
-	len_size = getline(&fname,&len,stdin);
+
+    len_size = get_input(fname, MAX_SIZE_NAME);
     for(i = 0;i < last; i++)
 		if(strcmp(fname,A[i].fname) == 0) {
 			find=1;
@@ -296,7 +293,7 @@ void searchf(void)
 	}
 	printf("\nPress a key to search another contact.");
 	getc(stdin);
-	search();
+    free(fname);
 }
 
 void searchl(void)
@@ -306,7 +303,8 @@ void searchl(void)
 	size_t len=0;
 	size_t len_size=0;
 	printf("\n::Enter a last name to search:");
-	len_size = getline(&lname,&len,stdin);
+    len_size = get_input(lname, MAX_SIZE_NAME);
+
     for(i = 0;i < last; i++)
 		if(strcmp(lname,A[i].lname) == 0) {
 			find=1;
@@ -321,20 +319,17 @@ void searchl(void)
 	}
 	printf("\nPress a key to search another contact.");
 	getc(stdin);
-	search();
+    free(lname);
 }
 
 void searchp(void)
 {
-	
-	char *phone = NULL;
 	int i,find=0;
 	char telep[5];
 	size_t len=0;
 	size_t len_size=0;
 	printf("\n::Enter a phone number to search:");
-	len_size = getline(&phone,&len,stdin);
-	strcpy(telep, phone);
+    len_size = get_input(telep, MAX_SIZE_NUMBER);
 	for(i = 0;i < last; i++)
 		if(strcmp(telep,A[i].telep) == 0) {
 			find=1;
@@ -349,20 +344,16 @@ void searchp(void)
 	}
 	printf("\nPress a key to search another contact.");
 	getc(stdin);
-	search();
 }
 
 void searchc(void)
 {
-	
-	char *phone = NULL;
 	char cell[5];
 	int i,find=0;
 	size_t len=0;
 	size_t len_size=0;
 	printf("\n::Enter a cellphone number to search:");
-	len_size = getline(&phone,&len,stdin);
-	strcpy(cell, phone);
+    len_size = get_input(cell, MAX_SIZE_NUMBER);
 	
     for(i = 0; i < last; i++)
 		if(strcmp(cell,A[i].cellp) == 0) {
@@ -378,40 +369,42 @@ void searchc(void)
 	}
 	printf("\nPress a key to search another contact.");
 	getc(stdin);
-	search();
 }
 
 void sort(void)
 {
 	char ch;
-	clrscr();			
-    printf("\nPhone Book12<::>$earch Contacts");
-    printf("\n--------------------------------------------------------------------------------");
-	printf("\nChoose sort type,please:\n\n");
-	printf("\t[1] |--> Sort by first name\n");
-	printf("\t[2] |--> Sort by last name\n");
-	printf("\t[3] |--> Sort by phone number\n");
-	printf("\t[4] |--> Sort by cellphone number\n");
-	printf("\t[5] |--> Main Menu\n");	
-	printf("\n\t::Enter a number (1-5): ");
-	ch = getc(stdin);
-	getc(stdin);
-	printf("\n--------------------------------------------------------------------------------");
-    switch(ch){
-		case '1':
-		sortf();
-	    break;
-		case '2':
-		sortl();
-		break;
-		case '3':
-		sortp();
-		break;
-		case '4':
-		sortc();
-		case '5':
-		default:
-			return ;
+    while(1) {
+        clrscr();
+        printf("\nPhone Book12<::>$earch Contacts");
+        printf("\n--------------------------------------------------------------------------------");
+        printf("\nChoose sort type,please:\n\n");
+        printf("\t[1] |--> Sort by first name\n");
+        printf("\t[2] |--> Sort by last name\n");
+        printf("\t[3] |--> Sort by phone number\n");
+        printf("\t[4] |--> Sort by cellphone number\n");
+        printf("\t[5] |--> Main Menu\n");
+        printf("\n\t::Enter a number (1-5): ");
+        ch = getc(stdin);
+        getc(stdin);
+        printf("\n--------------------------------------------------------------------------------");
+        switch (ch) {
+            case '1':
+                sortf();
+                break;
+            case '2':
+                sortl();
+                break;
+            case '3':
+                sortp();
+                break;
+            case '4':
+                sortc();
+                break;
+            case '5':
+            default:
+                return;
+        }
     }
 }
 
@@ -430,7 +423,6 @@ void sortf(void)
 	list2();
 	printf("\n   ::Press any key to sort contact by another form... ");
 	getc(stdin);
-	sort();
 }
 
 void sortl(void)
@@ -448,7 +440,6 @@ void sortl(void)
 	list2();
 	printf("\n   ::Press any key to sort contact by another form... ");
 	getc(stdin);
-	sort();
 }
 void sortp(void)
 {
@@ -465,7 +456,6 @@ void sortp(void)
 	list2();
 	printf("\n   ::Press any key to sort contact by another form... ");
 	getc(stdin);
-	sort();
 }
 void sortc(void)
 {
@@ -482,7 +472,6 @@ void sortc(void)
 	list2();
 	printf("\n   ::Press any key to sort contact by another form... ");
 	getc(stdin);
-	sort();
 }
 
 void list()
@@ -580,3 +569,25 @@ void help(void)
 	 printf("%c[%d;%df", 0x1B, y, x);
  }
 
+size_t get_input(char* dst, size_t max_size){
+    size_t len_size = 0;
+    char* input = NULL;
+    size_t len = 0;
+    len_size = getline(&input, &len, stdin);
+
+    if(len_size == -1){
+        exit(EXIT_FAILURE);
+    }
+
+    if (len_size < max_size) {
+        input[len_size] = '\0';
+        strncpy(dst, input, len_size);
+    } else {
+        input[max_size] = '\0';
+        strncpy(dst, input, max_size);
+        len_size = max_size;
+    }
+
+    free(input);
+    return len_size;
+}
